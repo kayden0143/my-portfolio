@@ -37,12 +37,14 @@
     const output = document.getElementById("output");
 
     const commands = {
-      help: 'Commands: about, oracle, story, clear',
-      about: 'You are a curious explorer on the web, building something awesome.',
-      oracle: 'The oracle says: "Don’t wait for opportunity. Create it."',
-      story: 'You stand at the edge of a glowing rift. Do you enter? (this will expand later)',
-      clear: ''
-    };
+  help: 'Commands: about, oracle, skills, projects, contact, clear',
+  about: 'You are a curious explorer on the web, building something awesome.',
+  oracle: 'The oracle says: "Don’t wait for opportunity. Create it."',
+  skills: 'No formal coding skills yet.\nJust me, a bit of curiosity, and a lot of help from ChatGPT.\nLearning by building.',
+  projects: 'Projects:\n- Terminal Portfolio (this site)\n- Project 2: Coming soon!',
+  contact: 'Contact:\nEmail: <a href="mailto:kaydenintube@gmail.com" target="_blank">kaydenintube@gmail.com</a>\nGitHub: <a href="https://github.com/kayden0143" target="_blank">github.com/kayden0143</a>\nLinkedIn: <a href="https://linkedin.com/in/yourprofile" target="_blank">linkedin.com/in/yourprofile</a>'
+  clear: ''
+};
 
     input.addEventListener("keydown", function(e) {
       if (e.key === "Enter") {
@@ -50,7 +52,7 @@
         if (cmd === "clear") {
           output.textContent = "";
         } else if (commands[cmd]) {
-          output.textContent += `\n> ${cmd}\n${commands[cmd]}`;
+          output.innerHTML += `<br>> ${cmd}<br>${commands[cmd]}`;
         } else {
           output.textContent += `\n> ${cmd}\nCommand not found. Type "help"`;
         }
