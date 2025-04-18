@@ -1,10 +1,63 @@
-!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <title>Kayden's Portfolio</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Terminal Site</title>
+  <style>
+    body {
+      background: #000;
+      color: #0f0;
+      font-family: monospace;
+      padding: 20px;
+    }
+    #output {
+      white-space: pre-wrap;
+      margin-bottom: 10px;
+    }
+    #input {
+      width: 100%;
+      border: none;
+      background: none;
+      color: #0f0;
+      font-family: monospace;
+      font-size: 1em;
+    }
+    #input:focus {
+      outline: none;
+    }
+  </style>
 </head>
 <body>
-  <h1>Hello, I’m Kayden</h1>
-  <p>This is my first portfolio website!</p>
+  <div id="output">Welcome to your terminal site. Type "help" to begin.</div>
+  <input type="text" id="input" autofocus autocomplete="off" />
+  
+  <script>
+    const input = document.getElementById("input");
+    const output = document.getElementById("output");
+
+    const commands = {
+      help: 'Commands: about, oracle, story, clear',
+      about: 'You are a curious explorer on the web, building something awesome.',
+      oracle: 'The oracle says: "Don’t wait for opportunity. Create it."',
+      story: 'You stand at the edge of a glowing rift. Do you enter? (this will expand later)',
+      clear: ''
+    };
+
+    input.addEventListener("keydown", function(e) {
+      if (e.key === "Enter") {
+        const cmd = input.value.trim().toLowerCase();
+        if (cmd === "clear") {
+          output.textContent = "";
+        } else if (commands[cmd]) {
+          output.textContent += `\n> ${cmd}\n${commands[cmd]}`;
+        } else {
+          output.textContent += `\n> ${cmd}\nCommand not found. Type "help"`;
+        }
+        input.value = "";
+        window.scrollTo(0, document.body.scrollHeight);
+      }
+    });
+  </script>
 </body>
 </html>
