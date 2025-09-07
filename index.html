@@ -1,65 +1,191 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Terminal Site</title>
-  <style>
-    body {
-      background: #000;
-      color: #0f0;
-      font-family: monospace;
-      padding: 20px;
-    }
-    #output {
-      white-space: pre-wrap;
-      margin-bottom: 10px;
-    }
-    #input {
-      width: 100%;
-      border: none;
-      background: none;
-      color: #0f0;
-      font-family: monospace;
-      font-size: 1em;
-    }
-    #input:focus {
-      outline: none;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mohammed Abdullah</title>
+    <style>
+        :root {
+            --primary: #0f0; /* Classic Green */
+            --background: #000;
+            --secondary: #555;
+        }
+        body {
+            background-color: var(--background);
+            color: var(--primary);
+            font-family: 'Courier New', monospace;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        #terminal {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        #output {
+            white-space: pre-wrap;
+            margin-bottom: 10px;
+        }
+        .prompt {
+            color: var(--secondary);
+        }
+        .command { color: var(--primary); }
+        .error { color: #ff5252; }
+        .success { color: #00ff00; }
+        .info { color: #58a6ff; }
+        a { color: #0f0; text-decoration: underline; }
+        #input-line {
+            display: flex;
+            align-items: center;
+        }
+        #input {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-family: inherit;
+            font-size: 1em;
+            flex-grow: 1;
+            padding: 5px 0;
+            margin-left: 8px;
+        }
+        #input:focus {
+            outline: none;
+        }
+    </style>
 </head>
 <body>
-  <div id="output">Welcome to your terminal site. Type "help" to begin.</div>
-  <input type="text" id="input" autofocus autocomplete="off" />
-  
-  <script>
-    const input = document.getElementById("input");
-    const output = document.getElementById("output");
+    <div id="terminal">
+        <div id="output"></div>
+        <div id="input-line">
+            <span class="prompt">visitor@portfolio:~$</span>
+            <input type="text" id="input" autofocus autocomplete="off" />
+        </div>
+    </div>
 
-    const commands = {
-  help: 'Commands: about, oracle, skills, projects, contact, clear',
-  about: 'You are a curious explorer on the web, building something awesome.',
-  oracle: 'The oracle says: "Don’t wait for opportunity. Create it."',
-  skills: 'No formal coding skills yet.\nJust me, a bit of curiosity, and a lot of help from ChatGPT.\nLearning by building.',
-  projects: 'Projects:\n- Terminal Portfolio (this site)\n- Project 2: Coming soon!',
-  contact: 'Contact:\nEmail: <a href="mailto:kaydenintube@gmail.com" target="_blank">kaydenintube@gmail.com</a>\nGitHub: <a href="https://github.com/kayden0143" target="_blank">github.com/kayden0143</a>\nLinkedIn: <a href="https://linkedin.com/in/yourprofile" target="_blank">linkedin.com/in/yourprofile</a>'
-  clear: ''
-};
+    <script>
+        // DOM Elements
+        const inputField = document.getElementById('input');
+        const outputElement = document.getElementById('output');
+        let commandHistory = [];
+        let historyIndex = -1;
 
-    input.addEventListener("keydown", function(e) {
-      if (e.key === "Enter") {
-        const cmd = input.value.trim().toLowerCase();
-        if (cmd === "clear") {
-          output.textContent = "";
-        } else if (commands[cmd]) {
-          output.innerHTML += `<br>> ${cmd}<br>${commands[cmd]}`;
-        } else {
-          output.textContent += `\n> ${cmd}\nCommand not found. Type "help"`;
+        // XSS Protection Function
+        const escapeHtml = (unsafe) => {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        };
+
+        // Command Definitions
+        const commands = {
+            help: {
+                description: 'Show available commands',
+                execute: () => `<span class="info">Available commands:</span><br>
+  <span class="success">help</span>          - Show this help<br>
+  <span class="success">about</span>         - About me<br>
+  <span class="success">projects</span>      - View my projects<br>
+  <span class="success">skills</span>        - My technical skills<br>
+  <span class="success">contact</span>       - How to reach me<br>
+  <span class="success">clear</span>         - Clear the terminal`
+            },
+            about: {
+                description: 'About me',
+                execute: () => `I am Mohammed Abdullah, a BTech student in Computer Science (AI & ML) at Vaagdevi Engineering College, Warangal.
+I am passionate about deconstructing AI models to understand their core decision-making processes, not just their outputs.
+This terminal is my digital workshop.`
+            },
+            projects: {
+                description: 'My projects',
+                execute: () => `<span class="info">My Projects:</span><br><br>
+  <span class="success">• E-Commerce Framework</span><br>
+    Initiated development of a full-stack e-commerce platform to understand the integration of databases, user authentication, and payment gateways. The project was a valuable deep dive into practical web architecture.<br>
+    <a href="https://github.com/kayden0143/my-portfolio" target="_blank">[View on GitHub]</a><br><br>
+  <span class="success">• Interactive Terminal Portfolio (This Site)</span><br>
+    A responsive, command-line themed portfolio website built with vanilla JS. It features a custom command system, command history, and XSS protection.<br>
+    <a href="https://github.com/kayden0143/my-portfolio" target="_blank">[View on GitHub]</a>`
+            },
+            skills: {
+                description: 'My skills',
+                execute: () => `<span class="info">Technical Skills:</span><br><br>
+  <span class="success">• Languages:</span> Python, JavaScript<br>
+  <span class="success">• Interests:</span> Machine Learning, AI Fundamentals, Problem-Solving<br>
+  <span class="success">• Tools:</span> Git, Linux<br><br>
+  <span class="info">Always learning, always building.</span>`
+            },
+            contact: {
+                description: 'Contact information',
+                execute: () => `<span class="info">Let's connect:</span><br><br>
+  <span class="success">Email:</span>   <a href="mailto:mohammadabdullahar123@gmail.com">mohammadabdullahar123@gmail.com</a><br>
+  <span class="success">GitHub:</span>  <a href="https://github.com/kayden0143/my-portfolio" target="_blank">github.com/kayden0143</a><br>
+  <span class="success">LinkedIn:</span> <a href="https://www.linkedin.com/in/mohammed-abdullah-866507380" target="_blank">linkedin.com/in/mohammed-abdullah</a><br>
+  <span class="success">Location:</span> Warangal, India`
+            },
+            clear: {
+                description: 'Clear the terminal',
+                execute: () => { outputElement.innerHTML = ''; return ''; }
+            }
+        };
+
+        // Initialize the terminal
+        function initTerminal() {
+            addToOutput(`Welcome to Mohammed Abdullah's terminal portfolio.<br>Type <span class="success">'help'</span> to begin.`);
         }
-        input.value = "";
-        window.scrollTo(0, document.body.scrollHeight);
-      }
-    });
-  </script>
+
+        // Add output to the terminal
+        function addToOutput(html) {
+            outputElement.innerHTML += html + '<br>';
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+
+        // Handle command execution
+        function executeCommand(input) {
+            const command = input.trim().toLowerCase();
+            const args = [];
+            if (!command) return;
+
+            commandHistory.push(command);
+            historyIndex = commandHistory.length;
+
+            addToOutput(`<span class="prompt">visitor@portfolio:~$</span> ${escapeHtml(input)}`);
+
+            if (commands[command]) {
+                const result = commands[command].execute(args);
+                if (result) addToOutput(result);
+            } else {
+                addToOutput(`<span class="error">Command not found:</span> ${escapeHtml(command)}<br>Type <span class="success">'help'</span> for available commands.`);
+            }
+        }
+
+        // Event listener for input
+        inputField.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                executeCommand(inputField.value);
+                inputField.value = '';
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (commandHistory.length > 0) {
+                    if (historyIndex <= 0) historyIndex = commandHistory.length;
+                    historyIndex--;
+                    inputField.value = commandHistory[historyIndex];
+                }
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (historyIndex >= commandHistory.length - 1) {
+                    historyIndex = commandHistory.length;
+                    inputField.value = '';
+                } else {
+                    historyIndex++;
+                    inputField.value = commandHistory[historyIndex];
+                }
+            }
+        });
+
+        // Start the terminal
+        initTerminal();
+    </script>
 </body>
 </html>
